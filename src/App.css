@@ -1,42 +1,90 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+* {
+  user-select: none;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+
+
+.app {
+  /* --bg: #eee; */
+  /* --background: #eee; */
+  /* --bg6: #eee6; */
+  /* --bd-color: rgb(255, 255, 255); */
+  background: hsl(var(--background));
+  perspective: 600px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.dark .app {
+  background: hsl(var(--background));
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.app * {
+  transform-style: preserve-3d;
 }
+
+
+.app>button {
+  background: hsl(var(--background));
+  transition: transform 0.15s;
+  box-shadow: 2px 2px 3px #28282844,
+    -3px -3px 3px #ffffff;
+}
+
+.dark .app>button {
+  transition: transform 0.15s;
+  box-shadow: 2px 2px 6px #00000099,
+    -2px -2px 7px #444444;
+}
+
+.app>button:hover {
+  /* transform: translate3d(0, -0.2rem, 0); */
+}
+
+.app>button:active {
+  transform: scale(0.9);
+}
+
+.glass {
+  backdrop-filter: blur(0);
+  transition: all 0.2s;
+  pointer-events: none;
+}
+
+.glass.on {
+  backdrop-filter: blur(3px);
+  background: hsla(var(--background), 0.4);
+  pointer-events: all;
+}
+
+
+div:has(> .glass) {
+  transform: scale(1);
+  transition: all 0.3s;
+}
+
+div:has(> .glass.on) {
+  transform: scale(0.98);
+}
+
+
+
+/* 
+.card[data-state='1'] {
+  --bd-color: var(--team-1-color);
+  background-color: var(--team-1-color);
+}
+
+.card[data-state='2'] {
+  --bd-color: var(--team-2-color);
+  background-color: var(--team-2-color);
+
+} */
 
 .card {
-  padding: 2em;
+  box-sizing: border-box;
+  background: #f9f9f9;
 }
 
-.read-the-docs {
-  color: #888;
+.dark .card {
+  background: rgb(60, 60, 60);
+
 }

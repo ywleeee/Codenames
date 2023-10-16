@@ -1,35 +1,86 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+// import { useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import './App.css'
+import { CardContainer } from './components/CardContainer'
+import { Button } from '../@/components/ui/button'
+import { BibleItemLists, shuffle } from './components/Lists'
+import { SecretList } from './components/SecretList'
+import { ShuffleButton } from './components/ShuffleButton'
+import useScript from './components/hooks/useScript'
+import { ThemeProvider } from './components/ThemeProvider'
+import { Toggle } from './components/Toggle'
+import { SettingButton } from './components/SettingButton'
+import { RotateButton } from './components/RotateButton'
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [state, setState] = useState(() => {
+    let obj = {}
+    Object.keys(BibleItemLists).forEach(key => obj[key] = true)
+    return {
+      // useAllLists: true,
+      categories: obj,
+      dimension: 5,
+      flipState: null,
+      colors: ['transparent', '#52ffd155', '#817aff55', '#f255', '#9995'],
+      itemList: shuffle([].concat(...Object.values(BibleItemLists)))
+    }
+  })
+  let finalList = makeFinalList(state)
+  // console.log(makeFinalList(state))
+  useScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js")
+  useScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Flip.min.js")
+  useScript("https://unpkg.com/rough-notation/lib/rough-notation.iife.js")
+  useLayoutEffect(() => {
+    if (!state.flipState) return
+    console.log('ooo')
+    window.Flip && Flip.from(state.flipState, {
+      duration: 0.3,
+      stagger: 0.05,
+      onEnter: el => {
+        let newEl = gsap.utils.shuffle(el)
+        gsap.from(newEl, { stagger: 0.02, delay: 0, duration: 0.4, opacity: 0, z: null && -200 })
+      }
+    })
+  }, [state.flipState])
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+      <div className='app p-3 h-[100vh] w-[100vw]'>
+
+        <CardContainer finalList={finalList} state={state} />
+        <SecretList state={state} />
+        <SettingButton state={state} setState={setState} />
+        <Toggle />
+        <ShuffleButton
+          onClick={() => {
+            if (window.Flip) {
+              setState(s => ({ ...s, itemList: shuffle(s.itemList), flipState: Flip.getState('.card', { props: 'opacity' }) }))
+            } else {
+              setState(s => ({ ...s, itemList: shuffle(s.itemList) }))
+            }
+          }}
+          className='absolute left-3 bottom-3 rounded-md'
+        />
+        <RotateButton
+          onClick={() => {
+            gsap && gsap.to('.card', { rotate: 0 })
+          }}
+          style={{ transform: 'translateX(-50%)' }}
+          className='absolute left-[50%] bottom-3 rounded-md'
+        />
+        <RotateButton
+          onClick={() => {
+            gsap && gsap.to('.card', { rotate: 180 })
+          }}
+          style={{ transform: 'translateX(-50%) rotate(0deg)' }}
+          className='absolute left-[50%] top-3 rounded-md'
+        />
+
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count isss {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </ThemeProvider>
   )
 }
 
+function makeFinalList({ categories }) {
+  return shuffle([].concat(...Object.entries(categories).filter(arr => arr[1]).map(arr => BibleItemLists[arr[0]])))
+}
 export default App
